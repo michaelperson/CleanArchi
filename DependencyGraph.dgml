@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DirectedGraph xmlns="http://schemas.microsoft.com/vs/2009/dgml">
+  <Nodes>
+    <Node Id="@2" Category="CodeSchema_Assembly" Bounds="770.540704073728,660.887784429919,185.736666666667,25.96" FilePath="$(e263b331-73d7-4ff6-b571-6a9a433ac8b7.OutputPath)" Label="CleanArchi.Infrastructure.dll" UseManualLocation="True" />
+    <Node Id="D:\Repos\CleanArchi\CleanArchi.Infrastructure\bin\Debug\net8.0\CleanArchi.Application.dll" Category="CodeSchema_Assembly" Bounds="964.485688610101,437.511356536586,159.366666666667,25.96" Label="CleanArchi.Application" UseManualLocation="True" />
+    <Node Id="D:\Repos\CleanArchi\CleanArchi.Infrastructure\bin\Debug\net8.0\CleanArchi.Domain.dll" Category="CodeSchema_Assembly" Bounds="796.985222963968,293.278758958721,140.846666666667,25.96" Label="CleanArchi.Domain" UseManualLocation="True" />
+  </Nodes>
+  <Links>
+    <Link Source="@2" Target="D:\Repos\CleanArchi\CleanArchi.Infrastructure\bin\Debug\net8.0\CleanArchi.Application.dll" Bounds="873.912693659023,470.467601880829,154.091250654202,190.420195970733" />
+    <Link Source="@2" Target="D:\Repos\CleanArchi\CleanArchi.Infrastructure\bin\Debug\net8.0\CleanArchi.Domain.dll" Bounds="863.550277376235,328.23821066854,3.61915982659514,332.649587183023" />
+    <Link Source="D:\Repos\CleanArchi\CleanArchi.Infrastructure\bin\Debug\net8.0\CleanArchi.Application.dll" Target="D:\Repos\CleanArchi\CleanArchi.Infrastructure\bin\Debug\net8.0\CleanArchi.Domain.dll" Bounds="890.289011600439,324.928671394386,137.972756146767,112.582676872215" />
+  </Links>
+  <Categories>
+    <Category Id="CodeSchema_Assembly" Label="Assembly" BasedOn="File" CanBeDataDriven="True" DefaultAction="Microsoft.Contains" Icon="CodeSchema_Assembly" NavigationActionLabel="Assemblies" />
+    <Category Id="File" Label="File" CanBeDataDriven="True" DefaultAction="Microsoft.Contains" Icon="File" NavigationActionLabel="Files" />
+  </Categories>
+  <Properties>
+    <Property Id="Bounds" DataType="System.Windows.Rect" />
+    <Property Id="CanBeDataDriven" Label="CanBeDataDriven" Description="CanBeDataDriven" DataType="System.Boolean" />
+    <Property Id="DefaultAction" Label="DefaultAction" Description="DefaultAction" DataType="System.String" />
+    <Property Id="FilePath" Label="File Path" Description="File Path" DataType="System.String" />
+    <Property Id="Icon" DataType="System.String" />
+    <Property Id="Label" Label="Label" Description="Displayable label of an Annotatable object" DataType="System.String" />
+    <Property Id="NavigationActionLabel" Label="NavigationActionLabel" Description="NavigationActionLabel" DataType="System.String" />
+    <Property Id="UseManualLocation" DataType="System.Boolean" />
+  </Properties>
+  <QualifiedNames>
+    <Name Id="Assembly" Label="Assembly" ValueType="Uri" />
+  </QualifiedNames>
+  <IdentifierAliases>
+    <Alias n="1" Uri="Assembly=$(e263b331-73d7-4ff6-b571-6a9a433ac8b7.OutputPathUri)" />
+    <Alias n="2" Id="(@1)" />
+  </IdentifierAliases>
+  <Paths>
+    <Path Id="e263b331-73d7-4ff6-b571-6a9a433ac8b7.OutputPath" Value="D:\Repos\CleanArchi\CleanArchi.Infrastructure\bin\Debug\net8.0\CleanArchi.Infrastructure.dll" />
+    <Path Id="e263b331-73d7-4ff6-b571-6a9a433ac8b7.OutputPathUri" Value="file:///D:/Repos/CleanArchi/CleanArchi.Infrastructure/bin/Debug/net8.0/CleanArchi.Infrastructure.dll" />
+  </Paths>
+</DirectedGraph>
