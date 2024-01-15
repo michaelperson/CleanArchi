@@ -1,17 +1,21 @@
 ﻿using CleanArchi.Application.Common.Interfaces;
-using CleanArchi.Infrastructure.Identity.Model;
-using System.Reflection;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using System.Reflection.Emit;
 using CleanArchi.Domain.Entities;
+using CleanArchi.Infrastructure.Identity.Model;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using System.Reflection;
 
 namespace CleanArchi.Infrastructure.Data
 {
 	public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplicationDbContext
 	{
-		public ApplicationDbContext(DbContextOptions options) : base(options) { }
-		public DbSet<Member> TodoLists => Set<Member>();
+        public ApplicationDbContext()
+        {
+				
+        }
+        public ApplicationDbContext(DbContextOptions options) : base(options) { }
+		public DbSet<Member> Members => Set<Member>();
 
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
@@ -19,7 +23,14 @@ namespace CleanArchi.Infrastructure.Data
 
 			base.OnModelCreating(builder);
 		}
-		 
-		 
+
+		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+		{
+			optionsBuilder.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=CleanArchi;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
+
+			base.OnConfiguring(optionsBuilder);
+		}
+
+
 	}
 }
