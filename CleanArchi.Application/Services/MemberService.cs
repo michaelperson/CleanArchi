@@ -1,5 +1,6 @@
 ﻿using CleanArchi.Application.Repository;
 using CleanArchi.Application.Services.Interfaces;
+using CleanArchi.Domain.Entities;
 
 namespace CleanArchi.Application.Services
 {
@@ -11,7 +12,7 @@ namespace CleanArchi.Application.Services
 		{
 			this.memberRepository = memberRepository;
 		}
-		List<Domain.Member> IMemberService.GetAllMembers()
+		List<Member> IMemberService.GetAllMembers()
 		{
 			return this.memberRepository.GetAllMembers();
 		}
