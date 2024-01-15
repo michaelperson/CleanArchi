@@ -25,7 +25,11 @@ namespace CleanArchi.Infrastructure.Data.Configurations
 			builder.Property(t => t.Email)
 				.HasMaxLength(320)
 				.IsRequired();
-		}
+		 
+			builder.Property(t => t.Gender)
+				.HasMaxLength(1)
+				.IsRequired();
 	}
+}
 	 
 }

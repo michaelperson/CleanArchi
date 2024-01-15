@@ -46,6 +46,11 @@ namespace CleanArchi.Infrastructure
 			services.AddAuthorizationCore(options =>
 				options.AddPolicy(Policies.CanDelete, policy => policy.RequireRole(Roles.Administrator)));
 
+
+
+			
+
+
 			return services;
 		}
 	}
