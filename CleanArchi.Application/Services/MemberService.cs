@@ -1,4 +1,5 @@
-﻿using CleanArchi.Application.Repository;
+﻿using CleanArchi.Application.Dtos;
+using CleanArchi.Application.Repository;
 using CleanArchi.Application.Services.Interfaces;
 using CleanArchi.Domain.Entities;
 
@@ -12,9 +13,9 @@ namespace CleanArchi.Application.Services
 		{
 			this.memberRepository = memberRepository;
 		}
-		List<Member> IMemberService.GetAllMembers()
+		IEnumerable<MemberDTO> IMemberService.GetAllMembers()
 		{
-			return this.memberRepository.GetAllMembers();
+			return this.memberRepository.GetAllMembers().Select(m=>new MemberDTO() { Email = m.Email, Gender = m.Gender, Name = m.Name, Type = m.Type, Id = m.Id }) ;
 		}
 	}
 }

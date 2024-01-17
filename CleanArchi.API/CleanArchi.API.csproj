@@ -4,7 +4,9 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <InvariantGlobalization>false</InvariantGlobalization><!-- IMPORTANT POUR EFCore 8-->
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile><!-- IMPORTANT POUR EFCore 8-->
+    <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,10 +16,6 @@
   <ItemGroup>
     <ProjectReference Include="..\CleanArchi.Application\CleanArchi.Application.csproj" />
     <ProjectReference Include="..\CleanArchi.Infrastructure\CleanArchi.Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="infrastructure\" />
   </ItemGroup>
 
 </Project>
