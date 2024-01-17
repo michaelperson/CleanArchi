@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CleanArchi.Domain.Entities;
 
 namespace CleanArchi.Application.Services.Interfaces
 {
-	//Cet interface est utilisé pour les règles business / Use cases
-	public interface IMemberService
+    //Cet interface est utilisé pour les règles business / Use cases
+    public interface IMemberService
 	{
-		List<Domain.Member> GetAllMembers();
+		List<Member> GetAllMembers();
 	}
 }

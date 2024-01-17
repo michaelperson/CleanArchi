@@ -1,4 +1,4 @@
-﻿# DOMAIN LAYER
+﻿# DOMAIN LAYER OU CORE LAYER
 
 ![Onion](./Ressources/Layer.png)
 
