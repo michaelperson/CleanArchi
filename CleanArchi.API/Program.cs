@@ -14,6 +14,11 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using CleanArchi.API.infrastructure;
 using Microsoft.VisualBasic.FileIO;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using CleanArchi.Infrastructure.Tools.Mail;
+using CleanArchi.Infrastructure.Tools.Mail.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add the authorization services
@@ -71,6 +76,20 @@ builder.Services
 				.AddIdentityApiEndpoints<ApplicationUser>()
 				.AddEntityFrameworkStores<ApplicationDbContext>();
 
+//Mailing identity
+ 
+builder.Services.Configure<IdentityOptions>(options =>
+{
+	options.SignIn.RequireConfirmedEmail = true;
+});
+builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
+builder.Services.AddTransient<IEmailSender, EmailSender>();
+//Set to 5 days the validity of the email
+builder.Services.ConfigureApplicationCookie(o => {
+	o.ExpireTimeSpan = TimeSpan.FromDays(5);
+	o.SlidingExpiration = true;
+});
+
 
 var app = builder.Build();
 
@@ -99,7 +118,21 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 //Map identity
-app.MapGroup("/account").MapIdentityApi<ApplicationUser>();
+//app.MapGroup("/account").MapIdentityApi<ApplicationUser>();
+app.MapIdentityApi<ApplicationUser>();
+
+//logout possibility
+app.MapPost("/logout", async (SignInManager<ApplicationUser> signInManager,
+	[FromBody] object empty) =>
+{
+	if (empty != null)
+	{
+		await signInManager.SignOutAsync();
+		return Results.Ok();
+	}
+	return Results.Unauthorized();
+})
+.RequireAuthorization();
 
 app.MapControllers();
 
