@@ -10,5 +10,6 @@ namespace CleanArchi.Infrastructure.Identity.Model
 {
     public class ApplicationUser : IdentityUser
     {
+        //public string TwoFactorSecretKey { get; set; }
     }
 }

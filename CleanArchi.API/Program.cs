@@ -80,7 +80,7 @@ builder.Services
  
 builder.Services.Configure<IdentityOptions>(options =>
 {
-	options.SignIn.RequireConfirmedEmail = true;
+	options.SignIn.RequireConfirmedEmail = true; 
 });
 builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
 builder.Services.AddTransient<IEmailSender, EmailSender>();
@@ -91,8 +91,21 @@ builder.Services.ConfigureApplicationCookie(o => {
 });
 
 
-var app = builder.Build();
+// add CORS policy for Wasm client
+builder.Services.AddCors(
+    options => options.AddPolicy(
+        "wasm",
+        policy => policy.WithOrigins([builder.Configuration["BackendUrl"] ?? "https://localhost:7295",
+            builder.Configuration["FrontendUrl"] ?? "https://localhost:7296"])
+            .AllowAnyMethod()
+            .SetIsOriginAllowed(pol => true)
+            .AllowAnyHeader()
+            .AllowCredentials()));
 
+
+var app = builder.Build();
+// activate the CORS policy
+app.UseCors("wasm");
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -122,15 +135,12 @@ app.UseAuthorization();
 app.MapIdentityApi<ApplicationUser>();
 
 //logout possibility
-app.MapPost("/logout", async (SignInManager<ApplicationUser> signInManager,
-	[FromBody] object empty) =>
+app.MapPost("/logout", async (SignInManager<ApplicationUser> signInManager ) =>
 {
-	if (empty != null)
-	{
+	 
 		await signInManager.SignOutAsync();
 		return Results.Ok();
-	}
-	return Results.Unauthorized();
+	 
 })
 .RequireAuthorization();
 

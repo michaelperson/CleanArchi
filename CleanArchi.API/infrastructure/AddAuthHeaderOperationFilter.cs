@@ -40,7 +40,7 @@ namespace CleanArchi.API.infrastructure
 			var isAuthorized = controllerFilters.Any(d => d.AttributeType.Name==nameof(AuthorizeAttribute)) || actionFilters.Any(d => d.AttributeType.Name == nameof(AuthorizeAttribute));
 			var allowAnonymous = actionFilters.Any(d => d.AttributeType.Name==nameof(AllowAnonymousAttribute));
 
-			if (isAuthorized && !allowAnonymous)
+			if ((isAuthorized && !allowAnonymous ) || methodInfo.Name.Contains("MapIdentityApi")) //MapIdentityApi pour les endpoints identity générés
 			{
 				if (operation.Parameters == null)
 					operation.Parameters = new List<OpenApiParameter>();
