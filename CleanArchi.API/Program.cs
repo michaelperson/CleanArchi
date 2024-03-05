@@ -81,6 +81,7 @@ builder.Services
 builder.Services.Configure<IdentityOptions>(options =>
 {
 	options.SignIn.RequireConfirmedEmail = true; 
+	
 });
 builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
 builder.Services.AddTransient<IEmailSender, EmailSender>();
@@ -102,6 +103,11 @@ builder.Services.AddCors(
             .AllowAnyHeader()
             .AllowCredentials()));
 
+
+//Configure Authorization Flow
+builder.Services.AddAuthorization(options =>
+    options.AddPolicy("TwoFactorEnabled",
+        x => x.RequireClaim("TwoFactorEnabled", "true")));
 
 var app = builder.Build();
 // activate the CORS policy

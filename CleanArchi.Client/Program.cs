@@ -1,14 +1,14 @@
+using Blazor.QrCodeGen;
 using CleanArchi.Client.Components;
 using CleanArchi.Client.Identity;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.JSInterop;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
-builder.RootComponents.Add<HeadOutlet>("head::after");
-
-
+builder.RootComponents.Add<HeadOutlet>("head::after"); 
 
 // register the cookie handler
 builder.Services.AddScoped<CookieHandler>();
@@ -32,5 +32,8 @@ builder.Services.AddHttpClient(
     "Auth",
     opt => opt.BaseAddress = new Uri(builder.Configuration["BackendUrl"] ?? "https://localhost:7295"))
     .AddHttpMessageHandler<CookieHandler>();
+
+// Use for Js in code
+builder.Services.AddTransient(sp => new ModuleCreator(sp.GetService<IJSRuntime>()));
 
 await builder.Build().RunAsync();

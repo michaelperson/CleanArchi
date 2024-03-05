@@ -1,6 +1,10 @@
 ﻿@page "/private-page"
 @attribute [Authorize]
 @using System.Security.Claims
+@using Blazor.QrCodeGen
+@using CleanArchi.Client.Identity
+@using System.Drawing
+@inject IAccountManagement Acct
 
 <PageTitle>Private Page</PageTitle>
 
@@ -22,9 +26,18 @@
     </ul>
 }
 
+<h2>Enable 2FA Authentication</h2>
+Scannez le QrCode dans votre authentication App  
+<QrCode CanvasId="AnyId" Text="@QrKey"  />
+Encoder le code fourni pour activer la double authentification :
+<InputText DisplayName="Auth Code" Value="@AuthCode"></InputText>
+<button @onclick="Enable2FA">Envoyer</button>
+ 
 @code {
-    private IEnumerable<Claim> claims = Enumerable.Empty<Claim>();
 
+    private IEnumerable<Claim> claims = Enumerable.Empty<Claim>();
+    private string QrKey="empty";
+    private string AuthCode = "";
     [CascadingParameter]
     private Task<AuthenticationState>? AuthState { get; set; }
 
@@ -35,7 +48,37 @@
             return;
         }
 
-        var authState = await AuthState;
+        AuthenticationState authState = await AuthState;
         claims = authState.User.Claims;
+        GetData2FA();
+    }
+
+    private async void Enable2FA()
+    {
+        
+    }
+
+    private async void GetData2FA()
+    {
+        var result = await Acct.Enable2FA();
+        if (AuthState == null)
+        {
+            return;
+        }
+        AuthenticationState authState = await AuthState;
+        string? email = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        string qrstring = GenerateQrCodeUri("otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6", email??"", result);
+        QrKey = qrstring;
+        Console.WriteLine(qrstring);
+        StateHasChanged();
+    }
+
+    private string GenerateQrCodeUri(string AuthenticatorUriFormat,string email, string unformattedKey)
+    {
+        return string.Format(
+             AuthenticatorUriFormat,
+             "CleanArchi.local.dev",
+             email,
+            unformattedKey);
     }
 }

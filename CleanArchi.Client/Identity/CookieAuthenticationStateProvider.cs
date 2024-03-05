@@ -211,5 +211,35 @@ namespace CleanArchi.Client.Identity
 			await GetAuthenticationStateAsync();
 			return _authenticated;
 		}
+	
+	
+	
+	    public async Task<string> Enable2FA()
+		{
+            string? SharedKey = null;
+			try
+			{
+              HttpContent  httpContent = new StringContent("{}");
+                // the 2fa info endpoint is secured, so if the user isn't logged in this will fail
+                HttpResponseMessage TwoFaResponse = await _httpClient.PostAsJsonAsync("manage/2fa", httpContent);
+
+				// throw if  info wasn't retrieved
+				TwoFaResponse.EnsureSuccessStatusCode();
+
+				// user is authenticated,so let's build their authenticated identity
+				string TwoFaJson = await TwoFaResponse.Content.ReadAsStringAsync();
+				TwoFaModel? TwoFaData = JsonSerializer.Deserialize<TwoFaModel>(TwoFaJson, jsonSerializerOptions);
+				if (TwoFaData != null)
+				{
+					SharedKey = TwoFaData.SharedKey;
+
+				}
+			}
+			catch (Exception)
+			{
+				 
+			}
+			return SharedKey??"";
+        }
 	}
 }

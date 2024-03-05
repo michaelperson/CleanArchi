@@ -30,5 +30,7 @@ namespace CleanArchi.Client.Identity
         public Task<FormResult> RegisterAsync(string email, string password);
 
         public Task<bool> CheckAuthenticatedAsync();
+
+        public Task<string> Enable2FA();
     }
 }

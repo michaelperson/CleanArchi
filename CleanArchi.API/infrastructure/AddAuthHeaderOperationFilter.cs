@@ -35,9 +35,11 @@ namespace CleanArchi.API.infrastructure
 
 			MethodInfo methodInfo;
 			var ss = context.ApiDescription.TryGetMethodInfo(out methodInfo);
-			var controllerFilters = methodInfo.DeclaringType.CustomAttributes;
+			if (methodInfo == null) { return; }
+			var controllerFilters = methodInfo.DeclaringType?.CustomAttributes;
 			var actionFilters = methodInfo.CustomAttributes;
-			var isAuthorized = controllerFilters.Any(d => d.AttributeType.Name==nameof(AuthorizeAttribute)) || actionFilters.Any(d => d.AttributeType.Name == nameof(AuthorizeAttribute));
+			if (controllerFilters != null) return;
+			bool isAuthorized = controllerFilters.Any(d => d.AttributeType.Name==nameof(AuthorizeAttribute)) || actionFilters.Any(d => d.AttributeType.Name == nameof(AuthorizeAttribute));
 			var allowAnonymous = actionFilters.Any(d => d.AttributeType.Name==nameof(AllowAnonymousAttribute));
 
 			if ((isAuthorized && !allowAnonymous ) || methodInfo.Name.Contains("MapIdentityApi")) //MapIdentityApi pour les endpoints identity générés
