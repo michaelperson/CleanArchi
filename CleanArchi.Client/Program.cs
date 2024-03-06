@@ -36,4 +36,6 @@ builder.Services.AddHttpClient(
 // Use for Js in code
 builder.Services.AddTransient(sp => new ModuleCreator(sp.GetService<IJSRuntime>()));
 
+//Blazor boostrap
+builder.Services.AddBlazorBootstrap();
 await builder.Build().RunAsync();

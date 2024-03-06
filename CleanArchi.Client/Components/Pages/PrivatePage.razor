@@ -27,11 +27,14 @@
 }
 
 <h2>Enable 2FA Authentication</h2>
-Scannez le QrCode dans votre authentication App  
-<QrCode CanvasId="AnyId" Text="@QrKey"  />
-Encoder le code fourni pour activer la double authentification :
-<InputText DisplayName="Auth Code" Value="@AuthCode"></InputText>
-<button @onclick="Enable2FA">Envoyer</button>
+<center>
+    Scannez le QrCode dans votre authentication App  
+    <QrCode CanvasId="AnyId" Text="@QrKey"  />
+    <b>ET</b><br />
+    Encodez le code fourni pour activer la double authentification :<br />
+    <InputText DisplayName="Auth Code" @bind-Value="@AuthCode"></InputText>
+    <button @onclick="Enable2FA">Envoyer</button>
+</center>
  
 @code {
 
@@ -55,12 +58,12 @@ Encoder le code fourni pour activer la double authentification :
 
     private async void Enable2FA()
     {
-        
+        await Acct.Enable2FA(AuthCode);
     }
 
     private async void GetData2FA()
     {
-        var result = await Acct.Enable2FA();
+        var result = await Acct.GetData2FA();
         if (AuthState == null)
         {
             return;

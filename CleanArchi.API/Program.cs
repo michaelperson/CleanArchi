@@ -80,8 +80,8 @@ builder.Services
  
 builder.Services.Configure<IdentityOptions>(options =>
 {
-	options.SignIn.RequireConfirmedEmail = true; 
-	
+	options.SignIn.RequireConfirmedEmail = true;
+
 });
 builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
 builder.Services.AddTransient<IEmailSender, EmailSender>();
