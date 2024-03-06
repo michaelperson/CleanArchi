@@ -29,22 +29,25 @@
                     <label for="email">
                         Email:
                     </label>
-                    <input autofocus autocomplete="on" required id="email" name="emailInput" placeholder="Enter your email address" type="email" @bind-value="email" />
+                    <MudTextField @bind-Value="@email" AutoFocus Label="Enter your email addrese" Required RequiredError="Email is mandatory" InputType="InputType.Email" Variant="Variant.Outlined" />
+                
                 </div>
                 <div>
                     <label for="password">
                         Password:
                     </label>
-                    <input required id="password" name="passwordInput" placeholder="Enter your password" type="password" @bind-value="password" /><br />
+                    <MudTextField @bind-Value="@password" Label="Enter your password" Required RequiredError="Password is mandatory" InputType="InputType.Password" Variant="Variant.Outlined" />
+                   
                 </div>
                 <div>
                     <label for="confirmPassword">
                         Retype password:
-                    </label>
-                    <input required id="confirmPassword" name="confirmPasswordInput" placeholder="Re-enter your password" type="password" @bind-value="confirmPassword" />
+                    </label> 
+                    <MudTextField @bind-Value="@confirmPassword" Label="Re-enter your password" Required RequiredError="Password is mandatory" InputType="InputType.Password" Variant="Variant.Outlined" />
                 </div>
                 <div>
-                    <button class="btn btn-primary" @onclick="DoRegisterAsync">Register</button>
+                    <br />
+                    <MudButton Variant="Variant.Filled" @onclick="DoRegisterAsync" Color="Color.Primary" FullWidth="true">Register</MudButton> 
                 </div>
             </div>
         }

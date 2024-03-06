@@ -1,6 +1,8 @@
 ﻿@page "/login"
+@using CleanArchi.Client.Components.Modals
 @using CleanArchi.Client.Identity
 @inject IAccountManagement Acct
+@inject IDialogService DialogService
 
 <PageTitle>Login</PageTitle>
 
@@ -23,16 +25,24 @@
                 <label for="email">
                     Email:
                 </label>
-                <input required id="email" name="emailInput" placeholder="Enter your email address" type="email" @bind-value="email" />
+                <MudTextField @bind-Value="@email" Label="Enter your email addrese" Required RequiredError="Email is mandatory" InputType="InputType.Email" Variant="Variant.Outlined" />
+                
             </div>
             <div>
                 <label for="password">
                     Password:
                 </label>
-                <input required id="password" name="passwordInput" placeholder="Enter your password" type="password" @bind-value="password" />
+
+                <MudTextField @bind-Value="@password" Label="Enter your password" Required RequiredError="Password is mandatory" InputType="InputType.Password" Variant="Variant.Outlined" />
             </div>
-            <div>
-                <button class="btn btn-primary" @onclick="DoLoginAsync">Login</button>
+            <div> 
+                <br />
+                <MudButton Variant="Variant.Filled" @onclick="DoLoginAsync" Color="Color.Primary" FullWidth="true">Login</MudButton>
+            <style>
+                .my-custom-class {
+                    backdrop-filter: blur(10px);
+                }
+            </style>
             </div>
         </div>
     </NotAuthorized>
@@ -74,8 +84,38 @@
         }
         else
         {
-            errors = true;
-            errorList = result.ErrorList;
+            if (result.ErrorList[0] == "RequiresTwoFactor")
+            {
+                if( await OpenDialog())
+                {
+                    success = true;
+                    email = password = string.Empty;
+                }
+            }
+            else
+            {
+                errors = true;
+                errorList = result.ErrorList;
+            }
         }
+    }
+
+    private async Task<bool> OpenDialog()
+    {
+        var options = new DialogOptions { ClassBackground = "my-custom-class" };
+        var parameters = new DialogParameters<TwoFactorModal> { { x => x.user, new Client.Identity.Models.UserBasic() { Email = email, Password= password } } };
+        DialogResult? result =  await DialogService.Show<TwoFactorModal>("TwoFactor Authentication",parameters, options).Result;
+        if(result== DialogResult.Cancel())
+        {
+            errors = true;
+            errorList = ["Authentication Failed"];
+            return false;
+        }
+        if (result == DialogResult.Ok<string>("Authenticate"))
+        {
+
+            return true;
+        }
+        return false;
     }
 }

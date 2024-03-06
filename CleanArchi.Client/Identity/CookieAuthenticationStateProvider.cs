@@ -14,6 +14,7 @@ namespace CleanArchi.Client.Identity
     /// </summary>
     public class CookieAuthenticationStateProvider : AuthenticationStateProvider, IAccountManagement
 	{
+		private bool _twoFactorActivated = false;
 		/// <summary>
 		/// Map the JavaScript-formatted properties to C#-formatted classes.
 		/// </summary>
@@ -72,10 +73,12 @@ namespace CleanArchi.Client.Identity
 				{
 					return new FormResult { Succeeded = true };
 				}
-
-				// body should contain details about why it failed
-				var details = await result.Content.ReadAsStringAsync();
-				var problemDetails = JsonDocument.Parse(details);
+                // body should contain details about why it failed
+                var details = await result.Content.ReadAsStringAsync();
+                
+				 
+               
+                var problemDetails = JsonDocument.Parse(details);
 				var errors = new List<string>();
 				var errorList = problemDetails.RootElement.GetProperty("errors");
 
@@ -138,11 +141,21 @@ namespace CleanArchi.Client.Identity
 					// success!
 					return new FormResult { Succeeded = true };
 				}
+				else
+				{
+                    if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    {
+                        string details = await result.Content.ReadAsStringAsync();
+                        JsonDocument problemDetails = JsonDocument.Parse(details); 
+                        JsonElement error  = problemDetails.RootElement.GetProperty("detail");
+                        return new FormResult { Succeeded = false, ErrorList = [error.GetString()??"Undefined Error"] };
+                    }
+                }
 			}
 			catch { }
-
-			// unknown error
-			return new FormResult
+            
+            // unknown error
+            return new FormResult
 			{
 				Succeeded = false,
 				ErrorList = ["Invalid email and/or password."]
@@ -225,7 +238,7 @@ namespace CleanArchi.Client.Identity
 						new(ClaimTypes.Name, userInfo.Email),
                         new(ClaimTypes.Email, userInfo.Email),
 						new("info",userJson.ToString()),
-                        new("2FA", userInfo.IsTwoFactoreEnabled.ToString())
+                        new("2FA", _twoFactorActivated.ToString())
                     };
 
 					// add any additional claims
@@ -304,7 +317,17 @@ namespace CleanArchi.Client.Identity
 				// user is authenticated,so let's build their authenticated identity
                 string TwoFaJson = await TwoFaResponse.Content.ReadAsStringAsync();
                 TwoFaModel? TwoFaData = JsonSerializer.Deserialize<TwoFaModel>(TwoFaJson, jsonSerializerOptions);
-				Console.WriteLine(TwoFaJson);
+				
+				if (TwoFaData != null)
+				{
+					if (TwoFaData.IsTwoFactorEnabled)
+					{
+						_twoFactorActivated = true;
+                        // need to refresh auth state
+                        NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+
+                    }
+				}
             }
 			catch (Exception ex)
 			{

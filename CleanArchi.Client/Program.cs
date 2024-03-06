@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.JSInterop;
+using MudBlazor.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -36,6 +37,6 @@ builder.Services.AddHttpClient(
 // Use for Js in code
 builder.Services.AddTransient(sp => new ModuleCreator(sp.GetService<IJSRuntime>()));
 
-//Blazor boostrap
-builder.Services.AddBlazorBootstrap();
+//MudBlazor
+builder.Services.AddMudServices();
 await builder.Build().RunAsync();

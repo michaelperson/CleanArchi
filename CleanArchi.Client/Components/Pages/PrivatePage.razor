@@ -63,7 +63,7 @@
 
     private async void GetData2FA()
     {
-        var result = await Acct.GetData2FA();
+        string result = await Acct.GetData2FA();
         if (AuthState == null)
         {
             return;
@@ -71,8 +71,7 @@
         AuthenticationState authState = await AuthState;
         string? email = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
         string qrstring = GenerateQrCodeUri("otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6", email??"", result);
-        QrKey = qrstring;
-        Console.WriteLine(qrstring);
+        QrKey = qrstring; 
         StateHasChanged();
     }
 
