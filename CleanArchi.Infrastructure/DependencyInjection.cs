@@ -1,6 +1,7 @@
 ﻿using CleanArchi.Application.Common.Interfaces;
 using CleanArchi.Domain.Constants;
 using CleanArchi.Infrastructure.Data;
+using CleanArchi.Infrastructure.Identity.Claims;
 using CleanArchi.Infrastructure.Identity.Model;
 using CleanArchi.Infrastructure.Identity.Services;
 using Microsoft.AspNetCore.Identity;
@@ -33,14 +34,16 @@ namespace CleanArchi.Infrastructure
 
 			services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
 
-			services.AddScoped<ApplicationDbContextInitialiser>();
-			 
-			services 
-				.AddIdentityCore<ApplicationUser>()
-				.AddRoles<IdentityRole>()
+			//services.AddScoped<ApplicationDbContextInitialiser>();
+
+			services
+				.AddIdentityCore<ApplicationUser>() 				
+				.AddClaimsPrincipalFactory<ApplicationPrincipalFactory>() //Permet d'ajouter des claims supp au niveau du user
+				//.AddRoles<IdentityRole>()
 				.AddEntityFrameworkStores<ApplicationDbContext>();
 
-			services.AddSingleton(TimeProvider.System);
+
+            services.AddSingleton(TimeProvider.System);
 			services.AddTransient<IIdentityService, IdentityService>();
 
 			services.AddAuthorizationCore(options =>

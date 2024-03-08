@@ -39,7 +39,7 @@ namespace CleanArchi.Client.Identity
         public Task<bool> CheckAuthenticatedAsync();
 
         public Task<string> GetData2FA();
-
+        public Task Disable2FA();
         public Task Enable2FA(string code);
     }
 }

@@ -56,7 +56,14 @@ namespace CleanArchi.Infrastructure.Identity.Services
 			return user != null && await _userManager.IsInRoleAsync(user, role);
 		}
 
-		public async Task<bool> AuthorizeAsync(string userId, string policyName)
+        public    bool IsTwoFactorActivatedAsync(string userId)
+        {
+            var user = _userManager.Users.SingleOrDefault(u => u.Email == userId);
+
+			return user != null && user.TwoFactorEnabled;
+        }
+
+        public async Task<bool> AuthorizeAsync(string userId, string policyName)
 		{
 			var user = _userManager.Users.SingleOrDefault(u => u.Id == userId);
 

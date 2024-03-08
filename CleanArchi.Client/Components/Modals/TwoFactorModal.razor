@@ -14,35 +14,34 @@
     </DialogActions>
 </MudDialog>
 @code {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
     [Parameter] public UserBasic user { get; set; } = new UserBasic();
-    private string code2FA="";
-    private bool saveDevice = false;
+    private string code2FA=""; 
     async void  Submit()     
     {
 
 
         if (string.IsNullOrWhiteSpace(user.Email))
         {
-            MudDialog.Cancel();
+            MudDialog?.Cancel();
         }
 
         if (string.IsNullOrWhiteSpace(user.Password))
         {
-            MudDialog.Cancel();
+            MudDialog?.Cancel();
         }
         Console.WriteLine(code2FA);
         var result = await Acct.Login2FAAsync(user.Email!, user.Password!, code2FA!);
 
         if (result.Succeeded)
         {
-            MudDialog.Close(DialogResult.Ok(true));
+            MudDialog?.Close(DialogResult.Ok(true));
         }
         else
         {
-            MudDialog.Cancel();
+            MudDialog?.Cancel();
         }
       
     }
-    void Cancel() => MudDialog.Cancel();
+    void Cancel() => MudDialog?.Cancel();
 }

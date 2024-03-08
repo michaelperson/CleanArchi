@@ -236,9 +236,7 @@ namespace CleanArchi.Client.Identity
 					var claims = new List<Claim>
 					{
 						new(ClaimTypes.Name, userInfo.Email),
-                        new(ClaimTypes.Email, userInfo.Email),
-						new("info",userJson.ToString()),
-                        new("2FA", _twoFactorActivated.ToString())
+                        new(ClaimTypes.Email, userInfo.Email)
                     };
 
 					// add any additional claims
@@ -289,7 +287,14 @@ namespace CleanArchi.Client.Identity
 				TwoFaModel? TwoFaData = JsonSerializer.Deserialize<TwoFaModel>(TwoFaJson, jsonSerializerOptions);
 				if (TwoFaData != null)
 				{
-					SharedKey = TwoFaData.SharedKey;
+					if (TwoFaData.IsTwoFactorEnabled)
+					{
+						return "true";
+					}
+					else
+					{
+						SharedKey = TwoFaData.SharedKey;
+					}
 
 				}
 			}
@@ -300,7 +305,42 @@ namespace CleanArchi.Client.Identity
 			return SharedKey??"";
         }
 
-        public async Task Enable2FA(string code)
+		public async Task Disable2FA()
+        {
+            try
+            {
+                var payload = new TwoFactorConfig { Enable = false  };
+                Console.WriteLine(payload);
+
+
+                // the 2fa info endpoint is secured, so if the user isn't logged in this will fail
+                HttpResponseMessage TwoFaResponse = await _httpClient.PostAsJsonAsync("manage/2fa", payload);
+                // throw if  info wasn't retrieved
+                TwoFaResponse.EnsureSuccessStatusCode();
+
+
+                // user is authenticated,so let's build their authenticated identity
+                string TwoFaJson = await TwoFaResponse.Content.ReadAsStringAsync();
+                TwoFaModel? TwoFaData = JsonSerializer.Deserialize<TwoFaModel>(TwoFaJson, jsonSerializerOptions);
+
+                if (TwoFaData != null)
+                {
+                    if (TwoFaData.IsTwoFactorEnabled)
+                    {
+                        _twoFactorActivated = true;
+                        // need to refresh auth state
+                        NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+    
+    public async Task Enable2FA(string code)
         {
             try
 			{
