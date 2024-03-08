@@ -1,0 +1,47 @@
+﻿@using CleanArchi.Client.Identity
+@using CleanArchi.Client.Identity.Models
+@inject IAccountManagement Acct
+<MudDialog>
+    <DialogContent>
+        Veuillez encoder le code obtenu dans votre authenticator
+        <MudTextField @bind-Value="@code2FA" Label="TwoFactor Code" Required RequiredError="Code is mandatory" />
+
+      @*   <MudCheckBox @bind-Value="@saveDevice" Color="Color.Warning" Label="Se souvenir de la machine" CheckedIcon="@Icons.Material.Filled.Star" UncheckedIcon="@Icons.Material.Filled.StarOutline"></MudCheckBox> *@
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
+    [Parameter] public UserBasic user { get; set; } = new UserBasic();
+    private string code2FA=""; 
+    async void  Submit()     
+    {
+
+
+        if (string.IsNullOrWhiteSpace(user.Email))
+        {
+            MudDialog?.Cancel();
+        }
+
+        if (string.IsNullOrWhiteSpace(user.Password))
+        {
+            MudDialog?.Cancel();
+        }
+        Console.WriteLine(code2FA);
+        var result = await Acct.Login2FAAsync(user.Email!, user.Password!, code2FA!);
+
+        if (result.Succeeded)
+        {
+            MudDialog?.Close(DialogResult.Ok(true));
+        }
+        else
+        {
+            MudDialog?.Cancel();
+        }
+      
+    }
+    void Cancel() => MudDialog?.Cancel();
+}

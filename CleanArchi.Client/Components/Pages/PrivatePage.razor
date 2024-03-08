@@ -1,0 +1,124 @@
+﻿@page "/private-page"
+@attribute [Authorize]
+@using System.Security.Claims
+@using Blazor.QrCodeGen
+@using CleanArchi.Client.Components.Modals
+@using CleanArchi.Client.Identity
+@using System.Drawing
+@inject IAccountManagement Acct
+@inject IDialogService DialogService
+
+<PageTitle>Private Page</PageTitle>
+
+<h1>Private Page</h1>
+
+<AuthorizeView>
+    <p>Hello, @context.User.Identity?.Name! You're authenticated, so you can see this page that shows your claims.</p>
+</AuthorizeView>
+
+<h2>Claims</h2>
+
+@if (claims.Count() > 0)
+{ 
+        <MudList>
+            @foreach (var claim in claims)
+            {
+                <MudListItem><b>@claim.Type:</b> @claim.Value</MudListItem>
+            }
+            
+        </MudList>  
+}
+
+<hr />
+@if (Is2FActivated)
+{
+    <MudPaper Elevation="25" MaxWidth="250px">
+        <MudBadge Icon="@Icons.Material.Filled.Lock" Color="MudBlazor.Color.Success" Overlap="true" Bordered="true" Class="mx-6 my-4">
+            <MudButton Color="MudBlazor.Color.Success" OnClick="Disable2FA" Variant="Variant.Filled" DisableElevation="true">Security Authentification 2FA Activé</MudButton>
+        </MudBadge>
+    </MudPaper>
+    
+}
+else
+{
+    <MudPaper Elevation="25" MaxWidth="250px">
+        <MudBadge Icon="@Icons.Material.Filled.LockOpen" Color="MudBlazor.Color.Error" Overlap="true" Bordered="true" Class="mx-6 my-4">
+            <MudButton Color="MudBlazor.Color.Error" Variant="Variant.Filled" OnClick="OpenQrCodeModal" DisableElevation="true">Security Authentification 2FA Désactivé</MudButton>
+        </MudBadge>
+    </MudPaper>
+
+    
+}
+<style>
+    .my-custom-class {
+        backdrop-filter: blur(10px);
+    }
+</style>
+@code {
+
+    private IEnumerable<Claim> claims = Enumerable.Empty<Claim>();
+    private string QrKey="empty";
+    private string AuthCode = "";
+    private bool Is2FActivated = false;
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthState == null)
+        {
+            return;
+        }
+
+        AuthenticationState authState = await AuthState;
+        claims = authState.User.Claims;
+        await GetData2FA();
+    }
+
+    private async void OpenQrCodeModal()
+    {
+        var options = new DialogOptions { ClassBackground = "my-custom-class" };
+
+        var parameters = new DialogParameters<string>();
+        parameters.Add("QrKey", QrKey);
+        await DialogService.Show<Activate2FA>("TwoFactor Activation",parameters, options).Result;
+        await GetData2FA();
+
+    }
+    private async void Disable2FA()
+    {
+        await Acct.Disable2FA();
+        await  GetData2FA();
+    }
+    private async Task GetData2FA()
+    {
+        string result = await Acct.GetData2FA();
+        if (AuthState == null)
+        {
+            return;
+        }
+        AuthenticationState authState = await AuthState;
+        string? email = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        if(result=="true")
+        {
+            Is2FActivated = true;
+        }
+        else
+        {
+            string qrstring = GenerateQrCodeUri("otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6", email??"", result);
+            QrKey = qrstring; 
+        }
+        
+        
+        StateHasChanged();
+    }
+
+    private string GenerateQrCodeUri(string AuthenticatorUriFormat,string email, string unformattedKey)
+    {
+        return string.Format(
+             AuthenticatorUriFormat,
+             "CleanArchi.local.dev",
+             email,
+            unformattedKey);
+    }
+}

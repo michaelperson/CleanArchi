@@ -1,0 +1,114 @@
+﻿@page "/register"
+@using CleanArchi.Client.Identity
+@inject IAccountManagement Acct
+
+<PageTitle>Register</PageTitle>
+
+<h1>Register</h1>
+
+<AuthorizeView>
+    <Authorized>
+        <div class="alert alert-success">You're already logged in as @context.User.Identity?.Name.</div>
+    </Authorized>
+    <NotAuthorized>
+        @if (success)
+        {
+            <div class="alert alert-success">You successfully registered. Now you can <a href="login">login</a>.</div>
+        }
+        else
+        {
+            if (errors)
+            {
+                foreach (var error in errorList)
+                {
+                    <div class="alert alert-danger">@error</div>
+                }
+            }
+            <div class="flex-outer">
+                <div>
+                    <label for="email">
+                        Email:
+                    </label>
+                    <MudTextField @bind-Value="@email" AutoFocus Label="Enter your email addrese" Required RequiredError="Email is mandatory" InputType="InputType.Email" Variant="Variant.Outlined" />
+                
+                </div>
+                <div>
+                    <label for="password">
+                        Password:
+                    </label>
+                    <MudTextField @bind-Value="@password" Label="Enter your password" Required RequiredError="Password is mandatory" InputType="InputType.Password" Variant="Variant.Outlined" />
+                   
+                </div>
+                <div>
+                    <label for="confirmPassword">
+                        Retype password:
+                    </label> 
+                    <MudTextField @bind-Value="@confirmPassword" Label="Re-enter your password" Required RequiredError="Password is mandatory" InputType="InputType.Password" Variant="Variant.Outlined" />
+                </div>
+                <div>
+                    <br />
+                    <MudButton Variant="Variant.Filled" @onclick="DoRegisterAsync" Color="Color.Primary" FullWidth="true">Register</MudButton> 
+                </div>
+            </div>
+        }
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private bool success, errors;
+    private string email = string.Empty;
+    private string password = string.Empty;
+    private string confirmPassword = string.Empty;
+    private string[] errorList = [];
+
+    public async Task DoRegisterAsync()
+    {
+        success = errors = false;
+        errorList = [];
+
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            errors = true;
+            errorList = ["Email is required."];
+
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(password))
+        {
+            errors = true;
+            errorList = ["Password is required."];
+
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(confirmPassword))
+        {
+            errors = true;
+            errorList = ["Please confirm your password."];
+
+            return;
+        }
+
+        if (password != confirmPassword)
+        {
+            errors = true;
+            errorList = ["Passwords don't match."];
+
+            return;
+        }
+
+        var result = await Acct.RegisterAsync(email!, password!);
+
+        if (result.Succeeded)
+        {
+            success = true;
+            email = password = confirmPassword = string.Empty;
+        }
+        else
+        {
+            errors = true;
+            errorList = result.ErrorList;
+        }
+    }
+}

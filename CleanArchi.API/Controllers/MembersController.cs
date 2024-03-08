@@ -9,8 +9,9 @@ namespace CleanArchi.API.Controllers
 {
     [Route("api/[controller]")]
 	[ApiController]
-	[Produces("application/json")] 
-	public class MembersController : ControllerBase
+	[Produces("application/json")]
+    [ApiExplorerSettings(GroupName = "Member - Collection d'APIs pour la gestion des membres.")]
+    public class MembersController : ControllerBase
 	{
 		private readonly IMemberService memberService;
 

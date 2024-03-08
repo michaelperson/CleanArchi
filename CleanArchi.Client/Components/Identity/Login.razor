@@ -1,0 +1,121 @@
+﻿@page "/login"
+@using CleanArchi.Client.Components.Modals
+@using CleanArchi.Client.Identity
+@inject IAccountManagement Acct
+@inject IDialogService DialogService
+
+<PageTitle>Login</PageTitle>
+
+<h1>Login</h1>
+
+<AuthorizeView>
+    <Authorized>
+        <div class="alert alert-success">You're logged in as @context.User.Identity?.Name.</div>
+    </Authorized>
+    <NotAuthorized>
+        @if (errors)
+        {
+            @foreach (var error in errorList)
+            {
+                <div class="alert alert-danger">@error</div>
+            }
+        }
+        <div class="flex-outer">
+            <div>
+                <label for="email">
+                    Email:
+                </label>
+                <MudTextField @bind-Value="@email" Label="Enter your email addrese" Required RequiredError="Email is mandatory" InputType="InputType.Email" Variant="Variant.Outlined" />
+                
+            </div>
+            <div>
+                <label for="password">
+                    Password:
+                </label>
+
+                <MudTextField @bind-Value="@password" Label="Enter your password" Required RequiredError="Password is mandatory" InputType="InputType.Password" Variant="Variant.Outlined" />
+            </div>
+            <div> 
+                <br />
+                <MudButton Variant="Variant.Filled" @onclick="DoLoginAsync" Color="Color.Primary" FullWidth="true">Login</MudButton>
+            <style>
+                .my-custom-class {
+                    backdrop-filter: blur(10px);
+                }
+            </style>
+            </div>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private bool success, errors;
+    private string email = string.Empty;
+    private string password = string.Empty;
+    private string[] errorList = [];
+
+    public async Task DoLoginAsync()
+    {
+        success = errors = false;
+        errorList = [];
+
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            errors = true;
+            errorList = ["Email is required."];
+
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(password))
+        {
+            errors = true;
+            errorList = ["Password is required."];
+
+            return;
+        }
+
+        var result = await Acct.LoginAsync(email!, password!);
+
+        if (result.Succeeded)
+        {
+            success = true;
+            email = password = string.Empty;
+        }
+        else
+        {
+            if (result.ErrorList[0] == "RequiresTwoFactor")
+            {
+                if( await OpenDialog())
+                {
+                    success = true;
+                    email = password = string.Empty;
+                }
+            }
+            else
+            {
+                errors = true;
+                errorList = result.ErrorList;
+            }
+        }
+    }
+
+    private async Task<bool> OpenDialog()
+    {
+        var options = new DialogOptions { ClassBackground = "my-custom-class" };
+        var parameters = new DialogParameters<TwoFactorModal> { { x => x.user, new Client.Identity.Models.UserBasic() { Email = email, Password= password } } };
+        DialogResult? result =  await DialogService.Show<TwoFactorModal>("TwoFactor Authentication",parameters, options).Result;
+        if(result== DialogResult.Cancel())
+        {
+            errors = true;
+            errorList = ["Authentication Failed"];
+            return false;
+        }
+        if (result == DialogResult.Ok<string>("Authenticate"))
+        {
+
+            return true;
+        }
+        return false;
+    }
+}

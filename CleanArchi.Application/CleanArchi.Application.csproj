@@ -14,4 +14,8 @@
     <ProjectReference Include="..\CleanArchi.Domain\CleanArchi.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Common\Behaviors\" />
+  </ItemGroup>
+
 </Project>
