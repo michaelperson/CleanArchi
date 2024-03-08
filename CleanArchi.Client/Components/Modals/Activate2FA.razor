@@ -1,0 +1,49 @@
+﻿@attribute [Authorize]
+@using Blazor.QrCodeGen
+@using CleanArchi.Client.Identity
+
+@inject IAccountManagement Acct
+<style>
+    .mud-dialog-title{ background-color:lightgray;}
+</style>
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.LockPerson" Class="mr-3" /> Enable 2FA Authentication
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudGrid Spacing="6" Justify="Justify.Center">
+            <MudItem xs="12">
+                Scannez le QrCode dans votre Authenticator puis Encodez le code fourni pour activer la double authentification
+            </MudItem>
+            <MudItem xs="6"> 
+                    <QrCode CanvasId="AnyId" Text="@QrKey" Size="200" />  
+            </MudItem>
+            <MudItem xs="6">
+
+                <MudTextField Label="Auth Code" Required Variant="Variant.Outlined" @bind-Value="@AuthCode"></MudTextField>
+                    <MudButton Variant="Variant.Filled" @onclick="Enable2FA" Color="MudBlazor.Color.Primary" FullWidth="true">Envoyer</MudButton>
+                <MudButton Variant="Variant.Filled" @onclick="Cancel" Color="MudBlazor.Color.Error" FullWidth="true">Annuler</MudButton>
+               
+            </MudItem>
+        </MudGrid>
+            
+            
+        
+    </DialogContent>
+</MudDialog>
+ 
+
+@code {
+    [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
+    [Parameter] public string QrKey { get; set; } = "empty"; 
+
+    private string AuthCode = "";
+    private async Task Enable2FA()
+    {
+        await Acct.Enable2FA(AuthCode);
+        MudDialog?.Cancel();
+    }
+    void Cancel() => MudDialog?.Cancel();
+}

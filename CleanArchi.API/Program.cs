@@ -14,6 +14,11 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using CleanArchi.API.infrastructure;
 using Microsoft.VisualBasic.FileIO;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using CleanArchi.Infrastructure.Tools.Mail;
+using CleanArchi.Infrastructure.Tools.Mail.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add the authorization services
@@ -71,9 +76,42 @@ builder.Services
 				.AddIdentityApiEndpoints<ApplicationUser>()
 				.AddEntityFrameworkStores<ApplicationDbContext>();
 
+//Mailing identity
+ 
+builder.Services.Configure<IdentityOptions>(options =>
+{
+	options.SignIn.RequireConfirmedEmail = true;
+	
+});
+builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
+builder.Services.AddTransient<IEmailSender, EmailSender>();
+//Set to 5 days the validity of the email
+builder.Services.ConfigureApplicationCookie(o => {
+	o.ExpireTimeSpan = TimeSpan.FromDays(5);
+	o.SlidingExpiration = true;
+});
+
+
+// add CORS policy for Wasm client
+builder.Services.AddCors(
+    options => options.AddPolicy(
+        "wasm",
+        policy => policy.WithOrigins([builder.Configuration["BackendUrl"] ?? "https://localhost:7295",
+            builder.Configuration["FrontendUrl"] ?? "https://localhost:7296"])
+            .AllowAnyMethod()
+            .SetIsOriginAllowed(pol => true)
+            .AllowAnyHeader()
+            .AllowCredentials()));
+
+
+//Configure Authorization Flow
+builder.Services.AddAuthorization(options =>
+    options.AddPolicy("TwoFactorEnabled",
+        x => x.RequireClaim("TwoFactorEnabled", "true")));
 
 var app = builder.Build();
-
+// activate the CORS policy
+app.UseCors("wasm");
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -99,7 +137,18 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 //Map identity
-app.MapGroup("/account").MapIdentityApi<ApplicationUser>();
+//app.MapGroup("/account").MapIdentityApi<ApplicationUser>();
+app.MapIdentityApi<ApplicationUser>();
+
+//logout possibility
+app.MapPost("/logout", async (SignInManager<ApplicationUser> signInManager ) =>
+{
+	 
+		await signInManager.SignOutAsync();
+		return Results.Ok();
+	 
+})
+.RequireAuthorization();
 
 app.MapControllers();
 

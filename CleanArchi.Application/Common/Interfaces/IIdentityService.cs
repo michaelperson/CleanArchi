@@ -12,8 +12,9 @@ namespace CleanArchi.Application.Common.Interfaces
 		Task<string?> GetUserNameAsync(string userId);
 
 		Task<bool> IsInRoleAsync(string userId, string role);
+		bool IsTwoFactorActivatedAsync(string UserName);
 
-		Task<bool> AuthorizeAsync(string userId, string policyName);
+        Task<bool> AuthorizeAsync(string userId, string policyName);
 
 		Task<(Result Result, string UserId)> CreateUserAsync(string userName, string password);
 
