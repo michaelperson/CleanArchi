@@ -15,7 +15,7 @@ namespace CleanArchi.Application
 	{
 		public static IServiceCollection AddApplicationServices(this IServiceCollection services)
 		{
-			services.AddScoped<IMemberService, MemberService>();
+			
 
 			return services;
 		}

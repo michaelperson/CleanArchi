@@ -36,7 +36,7 @@ namespace CleanArchi.Infrastructure.Identity.Services
 			return user.UserName;
 		}
 
-		public async Task<(Result Result, string UserId)> CreateUserAsync(string userName, string password)
+		public async Task<(IResult Result, string UserId)> CreateUserAsync(string userName, string password)
 		{
 			var user = new ApplicationUser
 			{
@@ -79,14 +79,14 @@ namespace CleanArchi.Infrastructure.Identity.Services
 			return result.Succeeded;
 		}
 
-		public async Task<Result> DeleteUserAsync(string userId)
+		public async Task<IResult> DeleteUserAsync(string userId)
 		{
 			var user = _userManager.Users.SingleOrDefault(u => u.Id == userId);
 
 			return user != null ? await DeleteUserAsync(user) : Result.Success();
 		}
 
-		public async Task<Result> DeleteUserAsync(ApplicationUser user)
+		public async Task<IResult> DeleteUserAsync(ApplicationUser user)
 		{
 			var result = await _userManager.DeleteAsync(user);
 

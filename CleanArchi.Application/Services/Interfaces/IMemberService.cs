@@ -11,6 +11,6 @@ namespace CleanArchi.Application.Services.Interfaces
     //Cet interface est utilisé pour les règles business / Use cases
     public interface IMemberService
 	{
-		IEnumerable<MemberDTO> GetAllMembers();
+		IEnumerable<IMemberDTO> GetAllMembers();
 	}
 }

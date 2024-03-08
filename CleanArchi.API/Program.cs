@@ -67,8 +67,7 @@ builder.Services.AddSwaggerGen(options =>
 
 });
 
-builder.Services.AddScoped<IMemberRepository, MemberRepository>();
-builder.Services.AddScoped<IMemberService, MemberService>();
+
 
 
 //Add Identity endpoint

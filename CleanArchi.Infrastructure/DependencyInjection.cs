@@ -1,4 +1,7 @@
 ﻿using CleanArchi.Application.Common.Interfaces;
+using CleanArchi.Application.Repository;
+using CleanArchi.Application.Services;
+using CleanArchi.Application.Services.Interfaces;
 using CleanArchi.Domain.Constants;
 using CleanArchi.Infrastructure.Data;
 using CleanArchi.Infrastructure.Identity.Claims;
@@ -49,12 +52,13 @@ namespace CleanArchi.Infrastructure
 			services.AddAuthorizationCore(options =>
 				options.AddPolicy(Policies.CanDelete, policy => policy.RequireRole(Roles.Administrator)));
 
+            services.AddScoped<IMemberService, MemberService>();
+            services.AddScoped<IMemberRepository, MemberRepository>();
 
 
-			
 
 
-			return services;
+            return services;
 		}
 	}
 }
